@@ -1,0 +1,277 @@
+#
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+msgctxt "error:party.party:"
+msgid "Invalid VAT Number \"%s\"."
+msgstr "Número \"%s\" no es válido."
+
+msgctxt "error:party.party:"
+msgid "VAT Number already exists!"
+msgstr "¡Número de Céd./RUC ya existe!"
+
+msgctxt "error:product.template:"
+msgid "NAME Product already exists"
+msgstr "¡Nombre de producto ya existe!"
+
+#, fuzzy
+msgctxt "field:account.invoice.force_draw.start,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:party.party,type_document:"
+msgid "Type Document"
+msgstr "Tipo de documento"
+
+msgctxt "field:party.party,type_party:"
+msgid "Type Party"
+msgstr "Tipo de Tercero"
+
+msgctxt "model:account.invoice.force_draw.start,name:"
+msgid "Invoice Force Draw"
+msgstr "Forzar factura a borrador"
+
+msgctxt "model:ir.action,name:act_force_invoice_draw"
+msgid "Invoice Force Draw"
+msgstr "Forzar factura a borrador"
+
+#, fuzzy
+msgctxt "model:ir.action,name:report_balance_sheet"
+msgid "Balance Sheet"
+msgstr "Estado de Situación Financiera"
+
+#, fuzzy
+msgctxt "model:ir.action,name:report_income_statement"
+msgid "Income Statement"
+msgstr "Estado del Resultado Integral"
+
+#, fuzzy
+msgctxt "odt:account.balance_sheet:"
+msgid "$"
+msgstr "$"
+
+#, fuzzy
+msgctxt "odt:account.balance_sheet:"
+msgid "("
+msgstr "("
+
+#, fuzzy
+msgctxt "odt:account.balance_sheet:"
+msgid ")"
+msgstr ")"
+
+#, fuzzy
+msgctxt "odt:account.balance_sheet:"
+msgid "/"
+msgstr "/"
+
+msgctxt "odt:account.balance_sheet:"
+msgid "5"
+msgstr "6"
+
+msgctxt "odt:account.balance_sheet:"
+msgid "6"
+msgstr ""
+
+#, fuzzy
+msgctxt "odt:account.balance_sheet:"
+msgid ":"
+msgstr ":"
+
+msgctxt "odt:account.balance_sheet:"
+msgid "A"
+msgstr ""
+
+msgctxt "odt:account.balance_sheet:"
+msgid "A LA"
+msgstr ""
+
+msgctxt "odt:account.balance_sheet:"
+msgid "AÑO 201"
+msgstr ""
+
+msgctxt "odt:account.balance_sheet:"
+msgid "COMPAÑI"
+msgstr "EMPRES"
+
+#, fuzzy
+msgctxt "odt:account.balance_sheet:"
+msgid "ESTADO DE SITUACION FINANCIERA"
+msgstr "ESTADO DE SITUACION FINANCIERA"
+
+msgctxt "odt:account.balance_sheet:"
+msgid "FECHA"
+msgstr ""
+
+msgctxt "odt:account.balance_sheet:"
+msgid "FECHA DE IMPRESIÓN:"
+msgstr ""
+
+msgctxt "odt:account.balance_sheet:"
+msgid "NOLOGIE"
+msgstr ""
+
+msgctxt "odt:account.balance_sheet:"
+msgid "NOTAS"
+msgstr ""
+
+msgctxt "odt:account.balance_sheet:"
+msgid "O 201"
+msgstr ""
+
+msgctxt "odt:account.balance_sheet:"
+msgid "PRESIK TECH"
+msgstr ""
+
+msgctxt "odt:account.balance_sheet:"
+msgid "S"
+msgstr ""
+
+msgctxt "odt:account.balance_sheet:"
+msgid "TRYTON ERP"
+msgstr ""
+
+msgctxt "odt:account.balance_sheet:"
+msgid "[ PAG."
+msgstr ""
+
+msgctxt "odt:account.balance_sheet:"
+msgid "]"
+msgstr ""
+
+msgctxt "odt:account.balance_sheet:"
+msgid "|"
+msgstr ""
+
+msgctxt "odt:account.balance_sheet:"
+msgid "Ñ"
+msgstr ""
+
+#, fuzzy
+msgctxt "odt:account.income_statement:"
+msgid "$"
+msgstr "$"
+
+#, fuzzy
+msgctxt "odt:account.income_statement:"
+msgid "("
+msgstr "("
+
+#, fuzzy
+msgctxt "odt:account.income_statement:"
+msgid ")"
+msgstr ")"
+
+#, fuzzy
+msgctxt "odt:account.income_statement:"
+msgid "/"
+msgstr "/"
+
+#, fuzzy
+msgctxt "odt:account.income_statement:"
+msgid ":"
+msgstr ":"
+
+msgctxt "odt:account.income_statement:"
+msgid "ANALISIS"
+msgstr ""
+
+msgctxt "odt:account.income_statement:"
+msgid "COMPAÑIA"
+msgstr "EMPRESA"
+
+msgctxt "odt:account.income_statement:"
+msgid "DESCRIPCION"
+msgstr ""
+
+msgctxt "odt:account.income_statement:"
+msgid "ESTADO DE RESULTADO"
+msgstr "ESTADO DEL RESULTADO INTEGRAL"
+
+msgctxt "odt:account.income_statement:"
+msgid "FECHA DE IMPRESIÓN:"
+msgstr ""
+
+msgctxt "odt:account.income_statement:"
+msgid "INTEGRAL"
+msgstr ""
+
+msgctxt "odt:account.income_statement:"
+msgid "NOLOGIE"
+msgstr ""
+
+msgctxt "odt:account.income_statement:"
+msgid "PERIODO FINAL"
+msgstr ""
+
+msgctxt "odt:account.income_statement:"
+msgid "PERIODO INICIAL"
+msgstr ""
+
+msgctxt "odt:account.income_statement:"
+msgid "PRESIK TECH"
+msgstr ""
+
+msgctxt "odt:account.income_statement:"
+msgid "S"
+msgstr ""
+
+msgctxt "odt:account.income_statement:"
+msgid "TRYTON ERP"
+msgstr ""
+
+msgctxt "odt:account.income_statement:"
+msgid "VERTICAL"
+msgstr ""
+
+msgctxt "odt:account.income_statement:"
+msgid "[ PAG."
+msgstr ""
+
+msgctxt "odt:account.income_statement:"
+msgid "]"
+msgstr ""
+
+msgctxt "odt:account.income_statement:"
+msgid "|"
+msgstr ""
+
+msgctxt "selection:party.party,type_document:"
+msgid ""
+msgstr ""
+
+msgctxt "selection:party.party,type_document:"
+msgid "Cedula"
+msgstr ""
+
+msgctxt "selection:party.party,type_document:"
+msgid "Consumidor Final"
+msgstr ""
+
+msgctxt "selection:party.party,type_document:"
+msgid "Pasaporte"
+msgstr ""
+
+msgctxt "selection:party.party,type_document:"
+msgid "RUC"
+msgstr ""
+
+msgctxt "selection:party.party,type_party:"
+msgid ""
+msgstr ""
+
+msgctxt "selection:party.party,type_party:"
+msgid "Entidad Publica"
+msgstr ""
+
+msgctxt "selection:party.party,type_party:"
+msgid "Persona Juridica"
+msgstr ""
+
+msgctxt "selection:party.party,type_party:"
+msgid "Persona Natural"
+msgstr ""
+
+msgctxt "selection:party.party,type_party:"
+msgid "Sociedad"
+msgstr ""
