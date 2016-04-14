@@ -14,7 +14,6 @@ msgctxt "error:product.template:"
 msgid "NAME Product already exists"
 msgstr "¡Nombre de producto ya existe!"
 
-#, fuzzy
 msgctxt "field:account.invoice.force_draw.start,id:"
 msgid "ID"
 msgstr "ID"
@@ -35,32 +34,26 @@ msgctxt "model:ir.action,name:act_force_invoice_draw"
 msgid "Invoice Force Draw"
 msgstr "Forzar factura a borrador"
 
-#, fuzzy
 msgctxt "model:ir.action,name:report_balance_sheet"
 msgid "Balance Sheet"
 msgstr "Estado de Situación Financiera"
 
-#, fuzzy
 msgctxt "model:ir.action,name:report_income_statement"
 msgid "Income Statement"
 msgstr "Estado del Resultado Integral"
 
-#, fuzzy
 msgctxt "odt:account.balance_sheet:"
 msgid "$"
 msgstr "$"
 
-#, fuzzy
 msgctxt "odt:account.balance_sheet:"
 msgid "("
 msgstr "("
 
-#, fuzzy
 msgctxt "odt:account.balance_sheet:"
 msgid ")"
 msgstr ")"
 
-#, fuzzy
 msgctxt "odt:account.balance_sheet:"
 msgid "/"
 msgstr "/"
@@ -73,7 +66,6 @@ msgctxt "odt:account.balance_sheet:"
 msgid "6"
 msgstr ""
 
-#, fuzzy
 msgctxt "odt:account.balance_sheet:"
 msgid ":"
 msgstr ":"
@@ -94,7 +86,6 @@ msgctxt "odt:account.balance_sheet:"
 msgid "COMPAÑI"
 msgstr "EMPRES"
 
-#, fuzzy
 msgctxt "odt:account.balance_sheet:"
 msgid "ESTADO DE SITUACION FINANCIERA"
 msgstr "ESTADO DE SITUACION FINANCIERA"
@@ -147,27 +138,22 @@ msgctxt "odt:account.balance_sheet:"
 msgid "Ñ"
 msgstr ""
 
-#, fuzzy
 msgctxt "odt:account.income_statement:"
 msgid "$"
 msgstr "$"
 
-#, fuzzy
 msgctxt "odt:account.income_statement:"
 msgid "("
 msgstr "("
 
-#, fuzzy
 msgctxt "odt:account.income_statement:"
 msgid ")"
 msgstr ")"
 
-#, fuzzy
 msgctxt "odt:account.income_statement:"
 msgid "/"
 msgstr "/"
 
-#, fuzzy
 msgctxt "odt:account.income_statement:"
 msgid ":"
 msgstr ":"

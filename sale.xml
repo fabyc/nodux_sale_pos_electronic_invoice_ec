@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- This file is part of the sale_payment module for Tryton.
+The COPYRIGHT file at the top level of this repository contains the full
+copyright notices and license terms. -->
+<tryton>
+    <data>
+        
+         <record model="ir.action.report" id="nodux_sale_payment.report_invoice_pos">
+            <field name="name">Invoice</field>
+            <field name="model">sale.sale</field>
+            <field name="report_name">nodux_sale_payment.invoice_pos</field>
+            <field name="report">nodux_sale_pos_electronic_invoice_ec/invoice.odt</field>
+            <field name="style">nodux_sale_pos_electronic_invoice_ec/header_A4.odt</field>
+        </record>
+    </data>
+</tryton>
+
