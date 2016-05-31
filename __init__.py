@@ -7,11 +7,12 @@ from .shop import *
 
 def register():
     Pool.register(
+        Sale,
         SaleShop,
         module='nodux_sale_pos_electronic_invoice_ec', type_='model')
     Pool.register(
         WizardSalePayment,
         module='nodux_sale_pos_electronic_invoice_ec', type_='wizard')
     Pool.register(
-        InvoiceReportPos,
+        InvoiceReportPosE,
         module='nodux_sale_pos_electronic_invoice_ec', type_='report')        

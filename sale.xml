@@ -4,14 +4,25 @@ The COPYRIGHT file at the top level of this repository contains the full
 copyright notices and license terms. -->
 <tryton>
     <data>
-        
-         <record model="ir.action.report" id="nodux_sale_payment.report_invoice_pos">
-            <field name="name">Invoice</field>
+        <record model="ir.ui.view" id="sale_view_form">
             <field name="model">sale.sale</field>
-            <field name="report_name">nodux_sale_payment.invoice_pos</field>
+            <field name="inherit" ref="sale.sale_view_form"/>
+            <field name="name">sale_form</field>
+        </record>
+        
+         <record model="ir.action.report" id="report_invoice_pos_e">
+            <field name="name">Comprobante electronico</field>
+            <field name="model">sale.sale</field>
+            <field name="report_name">nodux_sale_pos_electronic_invoice_ec.invoice_pos_e</field>
             <field name="report">nodux_sale_pos_electronic_invoice_ec/invoice.odt</field>
             <field name="style">nodux_sale_pos_electronic_invoice_ec/header_A4.odt</field>
         </record>
+        
+        <record model="ir.action.keyword" id="report_invoice_pos_keyword">
+            <field name="keyword">form_print</field>
+            <field name="model">sale.sale,-1</field>
+            <field name="action" ref="report_invoice_pos_e"/>
+        </record>
+
     </data>
 </tryton>
-
