@@ -20,7 +20,7 @@ except:
     print("Warning: Does not possible import numword module!")
     print("Please install it...!")
 
-__all__ = ['Sale','WizardSalePayment', 'InvoiceReportPosE']
+__all__ = ['Sale', 'InvoiceReportPosE', 'WizardSalePayment']
 __metaclass__ = PoolMeta
 
 
@@ -29,11 +29,17 @@ class Sale:
     motivo = fields.Char('Motivo de devolucion', states={
             'readonly': Eval('state') != 'draft',
     })
+
 class WizardSalePayment:
     __name__ = 'sale.payment'
     print_ = StateAction('nodux_sale_pos_electronic_invoice_ec.report_invoice_pos_e')
 
+    @classmethod
+    def __setup__(cls):
+        super(WizardSalePayment, cls).__setup__()
+        
     def transition_pay_(self):
+        print "Sale electronic ***"
         pool = Pool()
         Date = pool.get('ir.date')
         Sale = pool.get('sale.sale')
@@ -95,6 +101,7 @@ class WizardSalePayment:
                 sale=active_id
                 )
             payment.save()
+
         if sale.acumulativo != True:
 
             Sale.workflow_to_end([sale])
@@ -124,14 +131,27 @@ class WizardSalePayment:
                 return 'end'
         else:
             if sale.total_amount != sale.paid_amount:
-                return 'start'
+                return 'end'
+            if (sale.total_amount == sale.paid_amount) | (sale.state != draft):
+                Sale.workflow_to_end([sale])
+                Invoice = Pool().get('account.invoice')
+                invoices = Invoice.search([('description','=',sale.reference)])
+                for i in invoices:
+                    invoice= i
+                print "**** ", invoice.get_invoice_element()
+
+                invoice.get_tax_element()
+                invoice.generate_xml_invoice()
+                invoice.get_detail_element()
+                invoice.action_generate_invoice()
+                invoice.connect_db()
+                sale.description = sale.reference
+                sale.save()
+                return 'end'
+            """
             if sale.state != 'draft':
                 return 'end'
-            sale.description = sale.reference
-            sale.save()
-
-            Sale.workflow_to_end([sale])
-
+            """
         return 'end'
 
 class InvoiceReportPosE(Report):
@@ -274,7 +294,7 @@ class InvoiceReportPosE(Report):
                     if str('{:.0f}'.format(t.rate*100)) == '0':
                         subtotal0= subtotal0 + (line.amount)
         if subtotal0 < 0:
-            subtotal0 = subtotal0*(-1) 
+            subtotal0 = subtotal0*(-1)
         return subtotal0
 
     @classmethod

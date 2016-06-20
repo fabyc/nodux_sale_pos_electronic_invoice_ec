@@ -15,4 +15,4 @@ def register():
         module='nodux_sale_pos_electronic_invoice_ec', type_='wizard')
     Pool.register(
         InvoiceReportPosE,
-        module='nodux_sale_pos_electronic_invoice_ec', type_='report')        
+        module='nodux_sale_pos_electronic_invoice_ec', type_='report')
