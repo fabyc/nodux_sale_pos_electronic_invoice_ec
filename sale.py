@@ -30,6 +30,10 @@ class Sale:
             'readonly': Eval('state') != 'draft',
     })
 
+    @classmethod
+    def __setup__(cls):
+        super(Sale, cls).__setup__()
+
 class WizardSalePayment:
     __name__ = 'sale.payment'
     print_ = StateAction('nodux_sale_pos_electronic_invoice_ec.report_invoice_pos_e')
@@ -37,7 +41,7 @@ class WizardSalePayment:
     @classmethod
     def __setup__(cls):
         super(WizardSalePayment, cls).__setup__()
-        
+
     def transition_pay_(self):
         print "Sale electronic ***"
         pool = Pool()
@@ -103,10 +107,11 @@ class WizardSalePayment:
             payment.save()
 
         if sale.acumulativo != True:
-
+            print "hasta aqui ingresa "
             Sale.workflow_to_end([sale])
             Invoice = Pool().get('account.invoice')
             invoices = Invoice.search([('description','=',sale.reference)])
+            print "La factura es  ", invoices
             for i in invoices:
                 invoice= i
             invoice.get_invoice_element()
