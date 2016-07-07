@@ -9,15 +9,15 @@ copyright notices and license terms. -->
             <field name="inherit" ref="sale.sale_view_form"/>
             <field name="name">sale_form</field>
         </record>
-        
+
          <record model="ir.action.report" id="report_invoice_pos_e">
             <field name="name">Comprobante electronico</field>
             <field name="model">sale.sale</field>
             <field name="report_name">nodux_sale_pos_electronic_invoice_ec.invoice_pos_e</field>
             <field name="report">nodux_sale_pos_electronic_invoice_ec/invoice.odt</field>
-            <field name="style">nodux_sale_pos_electronic_invoice_ec/header_A4.odt</field>
+            <field name="style"></field>
         </record>
-        
+
         <record model="ir.action.keyword" id="report_invoice_pos_keyword">
             <field name="keyword">form_print</field>
             <field name="model">sale.sale,-1</field>

@@ -12,3 +12,7 @@ class SaleShop:
     __name__ = 'sale.shop'
     lote = fields.Boolean('Enviar Comprobantes por Lote',
         help='Enviar sus comprobantes electronicos por Lote')
+
+    @staticmethod
+    def default_lote():
+        return False

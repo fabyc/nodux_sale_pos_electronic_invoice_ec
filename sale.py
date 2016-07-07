@@ -43,7 +43,6 @@ class WizardSalePayment:
         super(WizardSalePayment, cls).__setup__()
 
     def transition_pay_(self):
-        print "Sale electronic ***"
         pool = Pool()
         Date = pool.get('ir.date')
         Sale = pool.get('sale.sale')
@@ -59,6 +58,13 @@ class WizardSalePayment:
 
         active_id = Transaction().context.get('active_id', False)
         sale = Sale(active_id)
+        if sale.self_pick_up == False:
+            sale.create_shipment('out')
+            sale.set_shipment_state()
+        date = Pool().get('ir.date')
+        date = date.today()
+        if form.payment_amount == 0 and form.party.vat_number == '9999999999999':
+            self.raise_user_error('No se puede dar credito a consumidor final, monto a pagar no puede ser %s', form.payment_amount)
 
         if form.tipo_p == 'cheque':
             sale.tipo_p = form.tipo_p
@@ -67,6 +73,7 @@ class WizardSalePayment:
             sale.fecha_deposito= form.fecha_deposito
             sale.titular = form.titular
             sale.numero_cheque = form.numero_cheque
+            sale.sale_date = date
             sale.save()
 
         if form.tipo_p == 'deposito':
@@ -75,16 +82,23 @@ class WizardSalePayment:
             sale.numero_cuenta_deposito = form.numero_cuenta_deposito
             sale.fecha_deposito = form.fecha_deposito
             sale.numero_deposito= form.numero_deposito
+            sale.sale_date = date
+            sale.save()
 
         if form.tipo_p == 'tarjeta':
             sale.tipo_p = form.tipo_p
             sale.numero_tarjeta = form.numero_tarjeta
             sale.lote = form.lote
-            sale.tipo_tarjeta = form.tipo_tarjeta
+            sale.tarjeta = form.tarjeta
+            sale.sale_date = date
+            sale.save()
 
         if form.tipo_p == 'efectivo':
+            sale.tipo_p = form.tipo_p
             sale.recibido = form.recibido
             sale.cambio = form.cambio_cliente
+            sale.sale_date = date
+            sale.save()
 
         if not sale.reference:
             Sale.set_reference([sale])
@@ -107,19 +121,21 @@ class WizardSalePayment:
             payment.save()
 
         if sale.acumulativo != True:
-            print "hasta aqui ingresa "
             Sale.workflow_to_end([sale])
             Invoice = Pool().get('account.invoice')
             invoices = Invoice.search([('description','=',sale.reference)])
-            print "La factura es  ", invoices
+            lote = False
+            if sale.lote != None:
+                lote = sale.lote
             for i in invoices:
                 invoice= i
-            invoice.get_invoice_element()
-            invoice.get_tax_element()
-            invoice.generate_xml_invoice()
-            invoice.get_detail_element()
-            invoice.action_generate_invoice()
-            invoice.connect_db()
+            if lote == False:
+                invoice.get_invoice_element()
+                invoice.get_tax_element()
+                invoice.generate_xml_invoice()
+                invoice.get_detail_element()
+                invoice.action_generate_invoice()
+                invoice.connect_db()
             sale.description = sale.reference
             sale.save()
 
@@ -138,13 +154,11 @@ class WizardSalePayment:
             if sale.total_amount != sale.paid_amount:
                 return 'end'
             if (sale.total_amount == sale.paid_amount) | (sale.state != draft):
-                Sale.workflow_to_end([sale])
                 Invoice = Pool().get('account.invoice')
                 invoices = Invoice.search([('description','=',sale.reference)])
                 for i in invoices:
                     invoice= i
-                print "**** ", invoice.get_invoice_element()
-
+                invoice.get_invoice_element()
                 invoice.get_tax_element()
                 invoice.generate_xml_invoice()
                 invoice.get_detail_element()
@@ -153,10 +167,7 @@ class WizardSalePayment:
                 sale.description = sale.reference
                 sale.save()
                 return 'end'
-            """
-            if sale.state != 'draft':
-                return 'end'
-            """
+
         return 'end'
 
 class InvoiceReportPosE(Report):
@@ -226,7 +237,8 @@ class InvoiceReportPosE(Report):
         localcontext['decimales'] = decimales
         localcontext['lineas'] = cls._get_lineas(Sale, sale)
         if invoice_e == 'true':
-            localcontext['barcode_img']=cls._get_barcode_img(Invoice, invoice)
+            if invoice.numero_autorizacion:
+                localcontext['barcode_img']=cls._get_barcode_img(Invoice, invoice)
         else:
             localcontext['barcode_img']= None
         #localcontext['fecha_de_emision']=cls._get_fecha_de_emision(Invoice, invoice)
