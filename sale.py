@@ -125,8 +125,9 @@ class WizardSalePayment:
             Invoice = Pool().get('account.invoice')
             invoices = Invoice.search([('description','=',sale.reference)])
             lote = False
-            if sale.lote != None:
-                lote = sale.lote
+            print sale.shop.lote
+            if sale.shop.lote != None:
+                lote = sale.shop.lote
             for i in invoices:
                 invoice= i
             if lote == False:
