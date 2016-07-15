@@ -46,7 +46,7 @@ class Sale:
 
     @staticmethod
     def default_number_invoice():
-        return '001-001-00'
+        return '001-001-000000000'
 
 class WizardSalePayment:
     __name__ = 'sale.payment'
