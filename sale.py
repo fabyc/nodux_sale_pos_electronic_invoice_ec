@@ -28,11 +28,25 @@ class Sale:
     __name__ ='sale.sale'
     motivo = fields.Char('Motivo de devolucion', states={
             'readonly': Eval('state') != 'draft',
-    })
+            })
+
+    fisic_invoice = fields.Boolean('Fisic Invoice', states={
+            'readonly' : Eval('state')!= 'draft',
+            })
+
+    number_invoice = fields.Char('Number Fisic Invoice', states={
+            'readonly' : Eval('state')!= 'draft',
+            'invisible' : ~Eval('fisic_invoice', True),
+            'required' :  Eval('fisic_invoice', True),
+            })
 
     @classmethod
     def __setup__(cls):
         super(Sale, cls).__setup__()
+
+    @staticmethod
+    def default_number_invoice():
+        return '001-001-00'
 
 class WizardSalePayment:
     __name__ = 'sale.payment'
@@ -125,18 +139,22 @@ class WizardSalePayment:
             Invoice = Pool().get('account.invoice')
             invoices = Invoice.search([('description','=',sale.reference)])
             lote = False
-            print sale.shop.lote
             if sale.shop.lote != None:
                 lote = sale.shop.lote
             for i in invoices:
                 invoice= i
-            if lote == False:
-                invoice.get_invoice_element()
-                invoice.get_tax_element()
-                invoice.generate_xml_invoice()
-                invoice.get_detail_element()
-                invoice.action_generate_invoice()
-                invoice.connect_db()
+            if sale.fisic_invoice == True :
+                invoice.number = sale.number_invoice
+                invoice.fisic_invoice = True
+                invoice.save()
+            else:
+                if lote == False:
+                    invoice.get_invoice_element()
+                    invoice.get_tax_element()
+                    invoice.generate_xml_invoice()
+                    invoice.get_detail_element()
+                    invoice.action_generate_invoice()
+                    invoice.connect_db()
             sale.description = sale.reference
             sale.save()
 

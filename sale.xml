@@ -10,6 +10,12 @@ copyright notices and license terms. -->
             <field name="name">sale_form</field>
         </record>
 
+        <record model="ir.ui.view" id="sale_pos_view_form">
+            <field name="model">sale.sale</field>
+            <field name="inherit" ref="sale_pos.sale_pos_view_form"/>
+            <field name="name">sale_pos_form</field>
+        </record>
+
          <record model="ir.action.report" id="report_invoice_pos_e">
             <field name="name">Comprobante electronico</field>
             <field name="model">sale.sale</field>

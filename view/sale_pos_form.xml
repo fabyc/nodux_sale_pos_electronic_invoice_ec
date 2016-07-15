@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- This file is part sale_pos module for Tryton.
+The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms. -->
+<data>
+
+    <xpath expr="/form/notebook/page[@id='sale']/field[@name='invoice_address']" position="after">
+        <separator colspan="2" id="fisic_info"/>
+        <label name="fisic_invoice"/>
+        <field name="fisic_invoice"/>
+        <label name="number_invoice"/>
+        <field name="number_invoice"/>
+    </xpath>
+</data>

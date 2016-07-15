@@ -14,33 +14,37 @@ msgctxt "error:product.template:"
 msgid "NAME Product already exists"
 msgstr "¡Nombre de producto ya existe!"
 
-msgctxt "field:account.invoice.force_draw.start,id:"
-msgid "ID"
-msgstr "ID"
-
 msgctxt "field:party.party,type_document:"
 msgid "Type Document"
 msgstr "Tipo de documento"
 
-msgctxt "field:party.party,type_party:"
-msgid "Type Party"
-msgstr "Tipo de Tercero"
+msgctxt "field:sale.sale,fisic_invoice:"
+msgid "Fisic Invoice"
+msgstr "Factura física"
 
-msgctxt "model:account.invoice.force_draw.start,name:"
+msgctxt "field:sale.sale,motivo:"
+msgid "Motivo de devolucion"
+msgstr ""
+
+msgctxt "field:sale.sale,number_invoice:"
+msgid "Number Fisic Invoice"
+msgstr "Numero factura física"
+
+msgctxt "field:sale.shop,lote:"
+msgid "Enviar Comprobantes por Lote"
+msgstr ""
+
+msgctxt "help:sale.shop,lote:"
+msgid "Enviar sus comprobantes electronicos por Lote"
+msgstr ""
+
+msgctxt "model:ir.action,name:"
 msgid "Invoice Force Draw"
-msgstr "Forzar factura a borrador"
-
-msgctxt "model:ir.action,name:act_force_invoice_draw"
-msgid "Invoice Force Draw"
-msgstr "Forzar factura a borrador"
-
-msgctxt "model:ir.action,name:report_balance_sheet"
-msgid "Balance Sheet"
-msgstr "Estado de Situación Financiera"
-
-msgctxt "model:ir.action,name:report_income_statement"
-msgid "Income Statement"
 msgstr "Estado del Resultado Integral"
+
+msgctxt "model:ir.action,name:report_invoice_pos_e"
+msgid "Comprobante electronico"
+msgstr ""
 
 msgctxt "odt:account.balance_sheet:"
 msgid "$"
@@ -72,15 +76,15 @@ msgstr ":"
 
 msgctxt "odt:account.balance_sheet:"
 msgid "A"
-msgstr ""
+msgstr "A"
 
 msgctxt "odt:account.balance_sheet:"
 msgid "A LA"
-msgstr ""
+msgstr "A LA"
 
 msgctxt "odt:account.balance_sheet:"
 msgid "AÑO 201"
-msgstr ""
+msgstr "AÑO 201"
 
 msgctxt "odt:account.balance_sheet:"
 msgid "COMPAÑI"
@@ -92,11 +96,11 @@ msgstr "ESTADO DE SITUACION FINANCIERA"
 
 msgctxt "odt:account.balance_sheet:"
 msgid "FECHA"
-msgstr ""
+msgstr "FECHA"
 
 msgctxt "odt:account.balance_sheet:"
 msgid "FECHA DE IMPRESIÓN:"
-msgstr ""
+msgstr "FECHA DE IMPRESIÓN:"
 
 msgctxt "odt:account.balance_sheet:"
 msgid "NOLOGIE"
@@ -104,7 +108,7 @@ msgstr ""
 
 msgctxt "odt:account.balance_sheet:"
 msgid "NOTAS"
-msgstr ""
+msgstr "NOTAS"
 
 msgctxt "odt:account.balance_sheet:"
 msgid "O 201"
@@ -116,7 +120,7 @@ msgstr ""
 
 msgctxt "odt:account.balance_sheet:"
 msgid "S"
-msgstr ""
+msgstr "S"
 
 msgctxt "odt:account.balance_sheet:"
 msgid "TRYTON ERP"
@@ -124,11 +128,11 @@ msgstr ""
 
 msgctxt "odt:account.balance_sheet:"
 msgid "[ PAG."
-msgstr ""
+msgstr "[ PAG."
 
 msgctxt "odt:account.balance_sheet:"
 msgid "]"
-msgstr ""
+msgstr "]"
 
 msgctxt "odt:account.balance_sheet:"
 msgid "|"
@@ -168,7 +172,7 @@ msgstr "EMPRESA"
 
 msgctxt "odt:account.income_statement:"
 msgid "DESCRIPCION"
-msgstr ""
+msgstr "DESCRIPCION"
 
 msgctxt "odt:account.income_statement:"
 msgid "ESTADO DE RESULTADO"
@@ -176,7 +180,7 @@ msgstr "ESTADO DEL RESULTADO INTEGRAL"
 
 msgctxt "odt:account.income_statement:"
 msgid "FECHA DE IMPRESIÓN:"
-msgstr ""
+msgstr "FECHA DE IMPRESIÓN:"
 
 msgctxt "odt:account.income_statement:"
 msgid "INTEGRAL"
@@ -200,7 +204,7 @@ msgstr ""
 
 msgctxt "odt:account.income_statement:"
 msgid "S"
-msgstr ""
+msgstr "S"
 
 msgctxt "odt:account.income_statement:"
 msgid "TRYTON ERP"
@@ -212,14 +216,306 @@ msgstr ""
 
 msgctxt "odt:account.income_statement:"
 msgid "[ PAG."
-msgstr ""
+msgstr "[ PAG."
 
 msgctxt "odt:account.income_statement:"
 msgid "]"
-msgstr ""
+msgstr "]"
 
 msgctxt "odt:account.income_statement:"
 msgid "|"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "$"
+msgstr "$"
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "%"
+msgstr "%"
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "(sin imp.)"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "0"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "0.00"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "14"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "4"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid ":"
+msgstr ":"
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "A"
+msgstr "A"
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "BORRADOR DE ORDEN DE VENTA"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "C"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "C.I./"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "CLAVE DE ACCESO:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "COTIZACIÓN"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Cantidad"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Cliente"
+msgstr "CLIENTE"
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Cliente:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Cod."
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Comprobante que se modifica"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Contribuyente especial Nro.:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "DESCUENT"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "DIR.:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Descripcion"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Descripción"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Description"
+msgstr "Descripción"
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Direcció"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Dirección"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Dirección:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "EMISION: NORMAL"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Email/Skype:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Email:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "FACTURA"
+msgstr "FACTURA"
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Fecha emision (comprobante a modificar)"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Fecha emisión"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Fecha:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Firma Autorizada"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Guía de remision:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "I"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "IVA 1"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Identificación:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "L"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "MBIENTE:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "NFORMACIÓN ADICIONAL"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "NOTA DE CRÉDITO"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "NUMERO DE AUTORIZACIÓN"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "N°:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "O"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "ONCESIONARIO CATAMAYO NRO 1"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Obligado a llevar contabilidad:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "PRODUCCIÓN"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Pago:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Precio Total"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Precio Unitario"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Principal"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "RUC"
+msgstr "RUC"
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "RUC:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Razón social/Nombre y Apellidos:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Razón:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "SUBTOTAL"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "SUBTOTAL 0%"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "SUBTOTAL SIN IMPUESTOS"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "SUBTOTAL excento de IVA"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "SUBTOTAL no objeto de IVA"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Subtotal"
+msgstr "Subtotal"
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Telfs.:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Teléfono"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Teléfono:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "VALOR TOTA"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "VALOR TOTAL"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "Vendedor:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "______________"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "n matriz:"
+msgstr ""
+
+msgctxt "odt:nodux_sale_pos_electronic_invoice_ec.invoice_pos_e:"
+msgid "n sucursal:"
 msgstr ""
 
 msgctxt "selection:party.party,type_document:"
@@ -228,36 +524,16 @@ msgstr ""
 
 msgctxt "selection:party.party,type_document:"
 msgid "Cedula"
-msgstr ""
+msgstr "Cédula"
 
 msgctxt "selection:party.party,type_document:"
 msgid "Consumidor Final"
-msgstr ""
+msgstr "Consumidor final"
 
 msgctxt "selection:party.party,type_document:"
 msgid "Pasaporte"
-msgstr ""
+msgstr "Pasaporte"
 
 msgctxt "selection:party.party,type_document:"
 msgid "RUC"
-msgstr ""
-
-msgctxt "selection:party.party,type_party:"
-msgid ""
-msgstr ""
-
-msgctxt "selection:party.party,type_party:"
-msgid "Entidad Publica"
-msgstr ""
-
-msgctxt "selection:party.party,type_party:"
-msgid "Persona Juridica"
-msgstr ""
-
-msgctxt "selection:party.party,type_party:"
-msgid "Persona Natural"
-msgstr ""
-
-msgctxt "selection:party.party,type_party:"
-msgid "Sociedad"
-msgstr ""
+msgstr "RUC"
