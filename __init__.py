@@ -9,6 +9,7 @@ def register():
     Pool.register(
         Sale,
         SaleShop,
+        SalePaymentForm,
         module='nodux_sale_pos_electronic_invoice_ec', type_='model')
     Pool.register(
         WizardSalePayment,
