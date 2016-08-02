@@ -20,7 +20,7 @@ except:
     print("Warning: Does not possible import numword module!")
     print("Please install it...!")
 
-__all__ = ['Sale', 'InvoiceReportPosE', 'WizardSalePayment']
+__all__ = ['Sale', 'SalePaymentForm','InvoiceReportPosE', 'WizardSalePayment']
 __metaclass__ = PoolMeta
 
 
@@ -40,6 +40,8 @@ class Sale:
             'required' :  Eval('fisic_invoice', True),
             })
 
+    formas_pago_sri = fields.Many2One('account.formas_pago', 'Formas de Pago SRI')
+
     @classmethod
     def __setup__(cls):
         super(Sale, cls).__setup__()
@@ -47,6 +49,36 @@ class Sale:
     @staticmethod
     def default_number_invoice():
         return '001-001-000000000'
+
+class SalePaymentForm():
+    __name__ = 'sale.payment.form'
+
+    tipo_pago_sri = fields.Many2One('account.formas_pago', 'Formas de Pago SRI')
+
+    @classmethod
+    def __setup__(cls):
+        super(SalePaymentForm, cls).__setup__()
+
+    @fields.depends('tipo_p', 'tipo_pago_sri')
+    def on_change_tipo_p(self):
+        pool = Pool()
+        Pago = pool.get('account.formas_pago')
+        pagos_e = Pago.search([('code', '=', '01')])
+        pagos_ch = Pago.search([('code', '=', '02')])
+        for p in pagos_e:
+            pago_e = p
+        for p_ch in pagos_ch:
+            pago_ch = p_ch
+        res= {}
+        if self.tipo_p:
+            if self.tipo_p == 'efectivo':
+                res['tipo_pago_sri'] = pago_e.id
+                return res
+            if self.tipo_p == 'cheque':
+                res['tipo_pago_sri'] = pago_ch.id
+                return res
+        return res
+
 
 class WizardSalePayment:
     __name__ = 'sale.payment'
@@ -77,6 +109,20 @@ class WizardSalePayment:
             sale.set_shipment_state()
         date = Pool().get('ir.date')
         date = date.today()
+        if form.payment_amount == 0 and form.party.vat_number == '9999999999999':
+            self.raise_user_error('No se puede dar credito a consumidor final, monto a pagar no puede ser %s', form.payment_amount)
+
+        if sale.total_amount > 200 and form.party.vat_number == '9999999999999':
+            self.raise_user_error('La factura supera los $200 de importe total, por cuanto no puede ser emitida a nombre de CONSUMIDOR FINAL')
+
+        if form.credito == True and form.payment_amount == sale.total_amount:
+            self.raise_user_error('No puede pagar el monto total %s en una venta a credito', form.payment_amount)
+
+        if form.credito == False and form.payment_amount < sale.total_amount:
+            self.raise_user_warning('not_credit%s' % sale.id,
+                   u'Esta seguro que desea abonar $%s '
+                'del valor total $%s, de la venta al CONTADO.', (form.payment_amount, sale.total_amount))
+
         if form.payment_amount == 0 and form.party.vat_number == '9999999999999':
             self.raise_user_error('No se puede dar credito a consumidor final, monto a pagar no puede ser %s', form.payment_amount)
 
@@ -135,14 +181,21 @@ class WizardSalePayment:
             payment.save()
 
         if sale.acumulativo != True:
+            sale.formas_pago_sri = form.tipo_pago_sri
+            sale.save()
             Sale.workflow_to_end([sale])
             Invoice = Pool().get('account.invoice')
             invoices = Invoice.search([('description','=',sale.reference)])
             lote = False
+
             if sale.shop.lote != None:
                 lote = sale.shop.lote
-            for i in invoices:
-                invoice= i
+
+            if invoices:
+                for i in invoices:
+                    invoice = i
+                invoice.formas_pago_sri = form.tipo_pago_sri
+
             if sale.fisic_invoice == True :
                 invoice.number = sale.number_invoice
                 invoice.fisic_invoice = True
@@ -159,15 +212,15 @@ class WizardSalePayment:
             sale.save()
 
             if sale.total_amount == sale.paid_amount:
-                return 'print_'
+                #return 'print_'
                 return 'end'
 
             if sale.total_amount != sale.paid_amount:
-                return 'print_'
+                #return 'print_'
                 return 'end'
 
             if sale.state != 'draft':
-                return 'print_'
+                #return 'print_'
                 return 'end'
         else:
             if sale.total_amount != sale.paid_amount:
