@@ -308,6 +308,7 @@ class InvoiceReportPosE(Report):
         localcontext['amount2words']=cls._get_amount_to_pay_words(Sale, sale)
         localcontext['decimales'] = decimales
         localcontext['lineas'] = cls._get_lineas(Sale, sale)
+        localcontext['maturity_date'] = cls._get_maturity_date(Invoice, invoice)
         if invoice_e == 'true':
             if invoice.numero_autorizacion:
                 localcontext['barcode_img']=cls._get_barcode_img(Invoice, invoice)
@@ -398,3 +399,20 @@ class InvoiceReportPosE(Report):
         image = buffer(output.getvalue())
         output.close()
         return image
+
+    @classmethod
+    def _get_maturity_date(cls, Invoice, invoice):
+        pool = Pool()
+        Invoice = pool.get('account.invoice')
+        MoveLine = pool.get('account.move.line')
+        PaymentLine = pool.get('account.voucher.line.paymode')
+        Date = pool.get('ir.date')
+        id_i = None
+        date = Date.today()
+
+        move = invoice.move
+        lines = MoveLine.search([('move', '=', move), ('party', '!=', None), ('maturity_date', '!=', None)])
+        if lines:
+            for l in lines:
+                date = l.maturity_date
+        return date
