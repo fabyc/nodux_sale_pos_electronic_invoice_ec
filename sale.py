@@ -59,25 +59,71 @@ class SalePaymentForm():
     def __setup__(cls):
         super(SalePaymentForm, cls).__setup__()
 
-    @fields.depends('tipo_p', 'tipo_pago_sri')
-    def on_change_tipo_p(self):
-        pool = Pool()
-        Pago = pool.get('account.formas_pago')
-        pagos_e = Pago.search([('code', '=', '01')])
-        pagos_ch = Pago.search([('code', '=', '02')])
-        for p in pagos_e:
-            pago_e = p
-        for p_ch in pagos_ch:
-            pago_ch = p_ch
-        res= {}
-        if self.tipo_p:
-            if self.tipo_p == 'efectivo':
-                res['tipo_pago_sri'] = pago_e.id
-                return res
-            if self.tipo_p == 'cheque':
-                res['tipo_pago_sri'] = pago_ch.id
-                return res
-        return res
+
+    @fields.depends('journal', 'party', 'tipo_p', 'tipo_pago_sri', 'credito')
+    def on_change_journal(self):
+        if self.journal:
+            result = {}
+            pool = Pool()
+            Statement=pool.get('account.statement')
+            statement = Statement.search([('journal', '=', self.journal.id)])
+            Pago = pool.get('account.formas_pago')
+            pagos_e = None
+            pagos_ch = None
+            pagos_t = None
+            pagos_n = None
+            pago_e = None
+            pago_ch = None
+            pago_t = None
+            pago_n = None
+            pagos_e = Pago.search([('code', '=', '01')])
+            pagos_ch = Pago.search([('code', '=', '02')])
+            pagos_t = Pago.search([('code', '=', '10')])
+            pagos_n = Pago.search([('name', '=', 'NINGUNA')])
+
+            if pagos_e:
+                for p in pagos_e:
+                    pago_e = p
+            if pagos_ch:
+                for p_ch in pagos_ch:
+                    pago_ch = p_ch
+            if pagos_t:
+                for p_t in pagos_t:
+                    pago_t = p_t
+            if pagos_n:
+                for p_n in pagos_n:
+                    pago_n = p_n
+
+            if statement:
+                for s in statement:
+                    result['tipo_p'] = s.tipo_pago
+                    tipo_p = s.tipo_pago
+                if tipo_p :
+                    pass
+                else:
+                    self.raise_user_error('No ha configurado el tipo de pago. \n-Seleccione el estado de cuenta en "Todos los estados de cuenta" \n-Seleccione forma de pago.')
+            else:
+                 self.raise_user_error('No ha creado el estado de cuenta para el punto de venta')
+
+            if tipo_p == 'cheque':
+                titular = self.party.name
+                result['titular'] = titular
+                if pago_ch:
+                    result['tipo_pago_sri'] = pago_ch.id
+
+            if tipo_p == 'efectivo':
+                if pago_e:
+                    result['tipo_pago_sri'] = pago_e.id
+
+            if tipo_p == 'tarjeta':
+                if pago_t:
+                    result['tipo_pago_sri'] = pago_t.id
+
+            if self.credito == True:
+                if pago_n:
+                    result['tipo_pago_sri'] = pago_n.id
+
+        return result
 
 
 class WizardSalePayment:
@@ -391,7 +437,6 @@ class InvoiceReportPosE(Report):
     def _get_barcode_img(cls, Invoice, invoice):
         from barras import CodigoBarra
         from cStringIO import StringIO as StringIO
-        # create the helper:
         codigobarra = CodigoBarra()
         output = StringIO()
         bars= invoice.numero_autorizacion
