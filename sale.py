@@ -241,6 +241,9 @@ class WizardSalePayment:
                 for i in invoices:
                     invoice = i
                 invoice.formas_pago_sri = form.tipo_pago_sri
+                if sale.comment:
+                    invoice.comment = sale.comment
+                    invoice.save()
 
             if sale.fisic_invoice == True :
                 invoice.number = sale.number_invoice
