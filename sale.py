@@ -357,7 +357,11 @@ class InvoiceReportPosE(Report):
         localcontext['amount2words']=cls._get_amount_to_pay_words(Sale, sale)
         localcontext['decimales'] = decimales
         localcontext['lineas'] = cls._get_lineas(Sale, sale)
-        localcontext['maturity_date'] = cls._get_maturity_date(Invoice, invoice)
+        if (sale.state == 'quotation') | (sale.state == 'draft'):
+            pass
+        else:
+            localcontext['maturity_date'] = cls._get_maturity_date(Invoice, invoice)
+
         if invoice_e == 'true':
             if invoice.numero_autorizacion:
                 localcontext['barcode_img']=cls._get_barcode_img(Invoice, invoice)
