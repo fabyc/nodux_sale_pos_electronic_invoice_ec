@@ -77,8 +77,8 @@ class SalePaymentForm():
             pago_t = None
             pago_n = None
             pagos_e = Pago.search([('code', '=', '01')])
-            pagos_ch = Pago.search([('code', '=', '02')])
-            pagos_t = Pago.search([('code', '=', '10')])
+            pagos_ch = Pago.search([('code', '=', '20')])
+            pagos_t = Pago.search([('code', '=', '19')])
             pagos_n = Pago.search([('name', '=', 'NINGUNA')])
 
             if pagos_e:
@@ -241,6 +241,7 @@ class WizardSalePayment:
                 for i in invoices:
                     invoice = i
                 invoice.formas_pago_sri = form.tipo_pago_sri
+                invoice.save()
                 if sale.comment:
                     invoice.comment = sale.comment
                     invoice.save()
