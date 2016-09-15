@@ -60,7 +60,7 @@ class SalePaymentForm():
         super(SalePaymentForm, cls).__setup__()
 
 
-    @fields.depends('journal', 'party', 'tipo_p', 'tipo_pago_sri', 'credito')
+    @fields.depends('journal', 'party', 'tipo_p', 'tipo_pago_sri', 'credito', 'amount')
     def on_change_journal(self):
         if self.journal:
             result = {}
@@ -71,15 +71,14 @@ class SalePaymentForm():
             pagos_e = None
             pagos_ch = None
             pagos_t = None
-            pagos_n = None
+
             pago_e = None
             pago_ch = None
             pago_t = None
-            pago_n = None
+
             pagos_e = Pago.search([('code', '=', '01')])
             pagos_ch = Pago.search([('code', '=', '20')])
             pagos_t = Pago.search([('code', '=', '19')])
-            pagos_n = Pago.search([('name', '=', 'NINGUNA')])
 
             if pagos_e:
                 for p in pagos_e:
@@ -90,9 +89,6 @@ class SalePaymentForm():
             if pagos_t:
                 for p_t in pagos_t:
                     pago_t = p_t
-            if pagos_n:
-                for p_n in pagos_n:
-                    pago_n = p_n
 
             if statement:
                 for s in statement:
@@ -119,12 +115,14 @@ class SalePaymentForm():
                 if pago_t:
                     result['tipo_pago_sri'] = pago_t.id
 
-            if self.credito == True:
-                if pago_n:
-                    result['tipo_pago_sri'] = pago_n.id
+            if self.credito == True and self.amount >=1000:
+                if pago_ch:
+                    result['tipo_pago_sri'] = pago_ch.id
 
+            if self.credito == True and self.amount < 1000:
+                if pago_e:
+                    result['tipo_pago_sri'] = pago_e.id
         return result
-
 
 class WizardSalePayment:
     __name__ = 'sale.payment'
@@ -168,9 +166,6 @@ class WizardSalePayment:
             self.raise_user_warning('not_credit%s' % sale.id,
                    u'Esta seguro que desea abonar $%s '
                 'del valor total $%s, de la venta al CONTADO.', (form.payment_amount, sale.total_amount))
-
-        if form.payment_amount == 0 and form.party.vat_number == '9999999999999':
-            self.raise_user_error('No se puede dar credito a consumidor final, monto a pagar no puede ser %s', form.payment_amount)
 
         if form.tipo_p == 'cheque':
             sale.tipo_p = form.tipo_p
@@ -227,12 +222,97 @@ class WizardSalePayment:
             payment.save()
 
         if sale.acumulativo != True:
+            pago_en_cero = False
+            utiliza_anticipo_venta = False
             sale.formas_pago_sri = form.tipo_pago_sri
             sale.save()
             Sale.workflow_to_end([sale])
             Invoice = Pool().get('account.invoice')
             invoices = Invoice.search([('description','=',sale.reference)])
             lote = False
+            modules = None
+            Module = pool.get('ir.module.module')
+            modules = Module.search([('name', '=', 'nodux_sale_payment_advanced_payment'), ('state', '=', 'installed')])
+            if modules:
+                move_invoice = None
+                for i in invoices:
+                    move_invoice = i.move
+                    invoice_advanced = i
+                #agregado para asientos de anticipos
+                Period = pool.get('account.period')
+                Move = pool.get('account.move')
+                Invoice = pool.get('account.invoice')
+                MoveLine = pool.get('account.move.line')
+                InvoiceAccountMoveLine = pool.get('account.invoice-account.move.line')
+                amount_a = Decimal(0.0)
+                account_types = ['receivable']
+
+                move_lines = MoveLine.search([
+                    ('party', '=', sale.party),
+                    ('account.kind', 'in', account_types),
+                    ('state', '=', 'valid'),
+                    ('reconciliation', '=', None),
+                    ('maturity_date', '=', None),
+                ])
+
+                for line in move_lines:
+                    lineas_anticipo_conciliar = (form.lineas_anticipo.replace("[", "").replace("]","").replace("'", "").replace("'", "")).split(",")
+                    for l in lineas_anticipo_conciliar:
+                        if str(line.id) == l:
+                            description = sale.reference
+                            new_advanced = form.anticipo-form.restante
+                            line.credit = Decimal(new_advanced)
+                            line.save()
+                            move = line.move
+                            move.description = description
+                            for m in move.lines:
+                                if m.debit > Decimal(0.0):
+                                    m.debit = Decimal(new_advanced)
+                                    m.save()
+                            move.save()
+                if form.restante > Decimal(0.0):
+                    Journal = pool.get('account.journal')
+                    journal_r = Journal.search([('type', '=', 'revenue')])
+                    for j in journal_r:
+                        journal_sale = j.id
+                    pago_en_cero = True
+                    utiliza_anticipo_venta = True
+                    #crear_nuevo_asiento
+                    move_lines_new = []
+                    line_move_ids = []
+                    reconcile_lines_advanced = []
+                    move, = Move.create([{
+                        'period': Period.find(sale.company.id, date=sale.sale_date),
+                        'journal': journal_sale,
+                        'date': sale.sale_date,
+                        'origin': str(sale),
+                    }])
+
+                    move_lines_new.append({
+                        'description': invoice_advanced.number,
+                        'debit': Decimal(0.0),
+                        'credit': form.restante,
+                        'account': invoice_advanced.party.account_receivable.id,
+                        'move': move.id,
+                        'party': sale.party.id,
+                        'journal': journal_sale,
+                        'period': Period.find(sale.company.id, date=sale.sale_date),
+                    })
+
+                    move_lines_new.append({
+                        'description': invoice_advanced.number,
+                        'debit': form.restante,
+                        'credit': Decimal(0.0),
+                        'account': 326,
+                        'move': move.id,
+                        'journal': journal_sale,
+                        'period': Period.find(sale.company.id, date=sale.sale_date),
+                    })
+                    created_lines = MoveLine.create(move_lines_new)
+
+
+                    Move.post([move])
+
 
             if sale.shop.lote != None:
                 lote = sale.shop.lote
@@ -258,8 +338,31 @@ class WizardSalePayment:
                     invoice.get_detail_element()
                     invoice.action_generate_invoice()
                     invoice.connect_db()
+
+
             sale.description = sale.reference
             sale.save()
+            if pago_en_cero == True and utiliza_anticipo_venta == True:
+                Line = pool.get('account.move.line')
+                account = sale.party.account_receivable
+                lines = []
+                amount = Decimal('0.0')
+                for invoice in sale.invoices:
+                    for line in invoice.lines_to_pay:
+                        if not line.reconciliation:
+                            lines.append(line)
+                            amount += line.debit - line.credit
+                moves = Move.search([('description', '=', sale.reference)])
+                for move in moves:
+                    if not move:
+                        continue
+                    for line in move.lines:
+                        if (not line.reconciliation and
+                                line.account.id == account.id):
+                            lines.append(line)
+                            amount += line.debit - line.credit
+                if lines and amount == Decimal('0.0'):
+                    Line.reconcile(lines)
 
             if sale.total_amount == sale.paid_amount:
                 #return 'print_'
@@ -369,8 +472,56 @@ class InvoiceReportPosE(Report):
         else:
             localcontext['barcode_img']= None
         #localcontext['fecha_de_emision']=cls._get_fecha_de_emision(Invoice, invoice)
+        localcontext['plazo'] = cls._get_plazo(Invoice, invoice)
+        localcontext['unidad'] = cls._get_unidad(Invoice, invoice)
+
         return super(InvoiceReportPosE, cls).parse(report, records, data,
                 localcontext=localcontext)
+
+    @classmethod
+    def _get_plazo(cls, Invoice, invoice):
+        plazo = 0
+        if invoice.payment_term:
+            day = 0
+            month = 0
+            week = 0
+            for l in invoice.payment_term.lines:
+                if l.days:
+                    day += l.days
+                if l.months:
+                    month += l.months
+                if l.weeks:
+                    week += l.weeks
+            if day >= 0 :
+                plazo = day
+            if month > 0:
+                plazo = month
+            if week > 0:
+                plazo = week
+        return plazo
+
+    @classmethod
+    def _get_unidad(cls, Invoice, invoice):
+        unidad = ""
+        if invoice.payment_term:
+            day = 0
+            month = 0
+            week = 0
+            for l in invoice.payment_term.lines:
+                if l.days:
+                    day += l.days
+                if l.months:
+                    month += l.months
+                if l.weeks:
+                    week += l.weeks
+            if day >= 0 :
+                unidad = 'dias'
+            if month > 0:
+                unidad = 'meses'
+            if week > 0:
+                unidad = 'semanas'
+        return unidad
+
     @classmethod
     def _get_amount_to_pay_words(cls, Sale, sale):
         amount_to_pay_words = Decimal(0.0)
