@@ -42,6 +42,10 @@ class Sale:
 
     formas_pago_sri = fields.Many2One('account.formas_pago', 'Formas de Pago SRI')
 
+    referencia_de_factura = fields.Char('Referencia de factura-devolucion')
+
+    devolucion = fields.Boolean('Devolucion')
+
     @classmethod
     def __setup__(cls):
         super(Sale, cls).__setup__()
@@ -222,6 +226,13 @@ class WizardSalePayment:
             payment.save()
 
         if sale.acumulativo != True:
+            if sale.total_amount < Decimal(0.0):
+                sale.devolucion = True
+                sales_d = Sale.search([('description', '=', sale.description)])
+                for sale_d in sales_d:
+                    sale_d.devolucion = True
+                    sale_d.referencia_de_factura = sale.description
+                    sale_d.save()
             pago_en_cero = False
             utiliza_anticipo_venta = False
             sale.formas_pago_sri = form.tipo_pago_sri
@@ -338,7 +349,6 @@ class WizardSalePayment:
                     invoice.get_detail_element()
                     invoice.action_generate_invoice()
                     invoice.connect_db()
-
 
             sale.description = sale.reference
             sale.save()
