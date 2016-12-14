@@ -142,6 +142,13 @@ class WizardSalePayment:
         Sale = pool.get('sale.sale')
         Statement = pool.get('account.statement')
         StatementLine = pool.get('account.statement.line')
+        Period = pool.get('account.period')
+        Move = pool.get('account.move')
+        Invoice = pool.get('account.invoice')
+        MoveLine = pool.get('account.move.line')
+        InvoiceAccountMoveLine = pool.get('account.invoice-account.move.line')
+        Journal = pool.get('account.journal')
+
         form = self.start
         statements = Statement.search([
                 ('journal', '=', form.journal),
@@ -152,6 +159,7 @@ class WizardSalePayment:
 
         active_id = Transaction().context.get('active_id', False)
         sale = Sale(active_id)
+        print "La descripcion cuando ingresa" , sale.reference
         if sale.self_pick_up == False:
             sale.create_shipment('out')
             sale.set_shipment_state()
@@ -170,6 +178,17 @@ class WizardSalePayment:
             self.raise_user_warning('not_credit%s' % sale.id,
                    u'Esta seguro que desea abonar $%s '
                 'del valor total $%s, de la venta al CONTADO.', (form.payment_amount, sale.total_amount))
+
+        if form.restante > Decimal(0.0) and form.devolver_restante == True:
+            self.raise_user_warning('devolucion%s' % sale.id,
+                   u'Esta seguro que desea devolver $%s '
+                'en efectivo.', (form.restante))
+
+        if form.restante > Decimal(0.0) and form.devolver_restante == False:
+            self.raise_user_warning('anticipo%s' % sale.id,
+                   u'Esta seguro que desea dejar $%s '
+                'como anticipo del Cliente %s.', (form.restante, sale.party.name))
+
 
         if form.tipo_p == 'cheque':
             sale.tipo_p = form.tipo_p
@@ -227,12 +246,54 @@ class WizardSalePayment:
 
         if sale.acumulativo != True:
             if sale.total_amount < Decimal(0.0):
+                move_lines_dev= []
+                line_move__dev_ids = []
+                reconcile_lines_dev_advanced = []
+
+                journal_r = Journal.search([('type', '=', 'revenue')])
+                for j in journal_r:
+                    journal_sale = j.id
+
+                move_dev, = Move.create([{
+                    'period': Period.find(sale.company.id, date=sale.sale_date),
+                    'journal': journal_sale,
+                    'date': sale.sale_date,
+                    'origin': str(sale),
+                    'description': 'ajustes '+ str(sale.description),
+                }])
+
+                move_lines_dev.append({
+                    'description': 'ajustes '+ str(sale.description),
+                    'debit': Decimal(0.0),
+                    'credit': sale.total_amount * (-1),
+                    'account': sale.party.account_receivable.id,
+                    'move': move_dev.id,
+                    'party': sale.party.id,
+                    'journal': journal_sale,
+                    'period': Period.find(sale.company.id, date=sale.sale_date),
+                })
+
+                move_lines_dev.append({
+                    'description':  'ajustes '+ str(sale.description),
+                    'debit': sale.total_amount * (-1),
+                    'credit': Decimal(0.0),
+                    'account': sale.party.account_receivable.id,
+                    'move': move_dev.id,
+                    'party': sale.party.id,
+                    'journal': journal_sale,
+                    'period': Period.find(sale.company.id, date=sale.sale_date),
+                })
+
+                created_lines_dev = MoveLine.create(move_lines_dev)
+                Move.post([move_dev])
+
                 sale.devolucion = True
                 sales_d = Sale.search([('description', '=', sale.description)])
                 for sale_d in sales_d:
                     sale_d.devolucion = True
                     sale_d.referencia_de_factura = sale.description
                     sale_d.save()
+
             pago_en_cero = False
             utiliza_anticipo_venta = False
             sale.formas_pago_sri = form.tipo_pago_sri
@@ -244,6 +305,7 @@ class WizardSalePayment:
             modules = None
             Module = pool.get('ir.module.module')
             modules = Module.search([('name', '=', 'nodux_sale_payment_advanced_payment'), ('state', '=', 'installed')])
+            print "La descripcion aqui", sale.reference
             if modules:
                 move_invoice = None
                 for i in invoices:
@@ -256,8 +318,8 @@ class WizardSalePayment:
                 MoveLine = pool.get('account.move.line')
                 InvoiceAccountMoveLine = pool.get('account.invoice-account.move.line')
                 amount_a = Decimal(0.0)
-                account_types = ['receivable']
-
+                account_types = ['receivable', 'payable']
+                """
                 move_lines = MoveLine.search([
                     ('party', '=', sale.party),
                     ('account.kind', 'in', account_types),
@@ -281,49 +343,162 @@ class WizardSalePayment:
                                     m.debit = Decimal(new_advanced)
                                     m.save()
                             move.save()
-                if form.restante > Decimal(0.0):
-                    Journal = pool.get('account.journal')
-                    journal_r = Journal.search([('type', '=', 'revenue')])
-                    for j in journal_r:
-                        journal_sale = j.id
-                    pago_en_cero = True
+                """
+                Configuration = pool.get('account.configuration')
+
+                if form.utilizar_anticipo == True:
+
                     utiliza_anticipo_venta = True
-                    #crear_nuevo_asiento
-                    move_lines_new = []
-                    line_move_ids = []
-                    reconcile_lines_advanced = []
-                    move, = Move.create([{
-                        'period': Period.find(sale.company.id, date=sale.sale_date),
-                        'journal': journal_sale,
-                        'date': sale.sale_date,
-                        'origin': str(sale),
-                    }])
+                    if Configuration(1).default_account_return:
+                        account_advanced = Configuration(1).default_account_advanced
 
-                    move_lines_new.append({
-                        'description': invoice_advanced.number,
-                        'debit': Decimal(0.0),
-                        'credit': form.restante,
-                        'account': invoice_advanced.party.account_receivable.id,
-                        'move': move.id,
-                        'party': sale.party.id,
-                        'journal': journal_sale,
-                        'period': Period.find(sale.company.id, date=sale.sale_date),
-                    })
+                    pool = Pool()
+                    ListAdvanced = pool.get('sale.list_advanced')
+                    all_list_advanced = ListAdvanced.search([('party', '=', sale.party)])
+                    move_lines_new_advanced = []
+                    if form.restante == Decimal(0.0):
+                        pagar = form.anticipo
+                        if all_list_advanced:
+                            for list_advanced in all_list_advanced:
+                                for line in list_advanced.lines:
+                                    if line.amount != line.utilizado:
+                                        if pagar > line.balance and line.balance > Decimal(0.0) and pagar > Decimal(0.0):
+                                            monto_balance = line.balance
+                                            line.utilizado = line.utilizado + monto_balance
+                                            line.balance = line.balance - monto_balance
+                                            line.save()
+                                            pagar = pagar - monto_balance
+                                            for linem in line.move.lines:
+                                                if linem.party and linem.credit > Decimal(0.0) and linem.reconciliation == None and linem.description == "":
+                                                    linem.description = "used"+str(sale.reference)
+                                                    linem.save()
+                                            move = line.move
+                                            move.description = sale.reference
+                                            move.save()
 
-                    move_lines_new.append({
-                        'description': invoice_advanced.number,
-                        'debit': form.restante,
-                        'credit': Decimal(0.0),
-                        'account': 326,
-                        'move': move.id,
-                        'journal': journal_sale,
-                        'period': Period.find(sale.company.id, date=sale.sale_date),
-                    })
-                    created_lines = MoveLine.create(move_lines_new)
+                                        elif pagar < line.balance and line.balance > Decimal(0.0) and pagar > Decimal(0.0):
+                                            monto_balance = pagar
+                                            line.utilizado = line.utilizado + monto_balance
+                                            line.balance = line.balance - monto_balance
+                                            line.save()
+                                            pagar = pagar - monto_balance
+
+                                            for linem in move.lines:
+                                                if linem.party and linem.credit > Decimal(0.0) and linem.reconciliation == None and linem.description == "":
+                                                    linem.credit = linem.credit - monto_balance
+                                                    linem.save()
+                                            move = line.move
+                                            move.description = sale.reference
+                                            move.save()
+
+                                            move_lines_new_advanced.append({
+                                                'description': "used"+str(sale.reference),
+                                                'debit': Decimal(0.0),
+                                                'credit': monto_balance,
+                                                'account': account_advanced.id,
+                                                'party' : sale.party.id,
+                                                'move': line.move.id,
+                                                'journal': line.move.journal.id,
+                                                'period': Period.find(sale.company.id, date=sale.sale_date),
+                                            })
+                                            created_lines = MoveLine.create(move_lines_new_advanced)
+                                            Move.post([line.move])
 
 
-                    Move.post([move])
+                    if form.restante > Decimal(0.0) and form.devolver_restante == False:
+                        pago_en_cero = True
+                        restante = form.restante
+                        pagar = form.anticipo - form.restante
+                        if all_list_advanced:
+                            for list_advanced in all_list_advanced:
+                                for line in list_advanced.lines:
+                                    if line.amount != line.utilizado:
+                                        if pagar > line.balance and line.balance > Decimal(0.0) and pagar > Decimal(0.0):
+                                            monto_balance = line.balance
+                                            line.utilizado = line.utilizado + monto_balance
+                                            line.balance = line.balance - monto_balance
+                                            line.save()
+                                            pagar = pagar - monto_balance
+                                            for linem in line.move.lines:
+                                                if linem.party and linem.credit > Decimal(0.0) and linem.reconciliation == None and linem.description == "":
+                                                    linem.description = "used"+str(sale.reference)
+                                                    linem.save()
+                                            move = line.move
+                                            move.description = sale.reference
+                                            move.save()
 
+                                        elif pagar < line.balance and line.balance > Decimal(0.0) and pagar > Decimal(0.0):
+                                            monto_balance = pagar
+                                            line.utilizado = line.utilizado + monto_balance
+                                            line.balance = line.balance - monto_balance
+                                            line.save()
+                                            pagar = pagar - monto_balance
+
+                                            for linem in line.move.lines:
+                                                if linem.party and linem.credit > Decimal(0.0) and linem.reconciliation == None and linem.description == "":
+                                                    linem.credit = linem.credit - monto_balance
+                                                    linem.save()
+
+                                            move_lines_new_advanced.append({
+                                                'description': "used"+str(sale.reference),
+                                                'debit': Decimal(0.0),
+                                                'credit': monto_balance,
+                                                'account': account_advanced.id,
+                                                'party' : sale.party.id,
+                                                'move': line.move.id,
+                                                'journal': line.move.journal.id,
+                                                'period': Period.find(sale.company.id, date=sale.sale_date),
+                                            })
+                                            created_lines = MoveLine.create(move_lines_new_advanced)
+                                            Move.post([line.move])
+                                            move = line.move
+                                            move.description = sale.reference
+                                            move.save()
+
+
+                    if form.restante > Decimal(0.0) and form.devolver_restante == True:
+                        if Configuration(1).default_account_return:
+                            account_return = Configuration(1).default_account_return
+                        else:
+                            self.raise_user_error('No ha configurado la cuenta para devolucion de anticipos.'
+                            '\nDirijase a Financiero-Configuracion-Configuracion Contable')
+
+                        Journal = pool.get('account.journal')
+                        journal_r = Journal.search([('type', '=', 'revenue')])
+                        for j in journal_r:
+                            journal_sale = j.id
+                        pago_en_cero = True
+                        #crear_nuevo_asiento
+                        move_lines_new = []
+                        line_move_ids = []
+                        reconcile_lines_advanced = []
+                        move, = Move.create([{
+                            'period': Period.find(sale.company.id, date=sale.sale_date),
+                            'journal': journal_sale,
+                            'date': sale.sale_date,
+                            'origin': str(sale),
+                        }])
+                        move_lines_new.append({
+                            'description': invoice_advanced.number,
+                            'debit': Decimal(0.0),
+                            'credit': form.restante,
+                            'account': invoice_advanced.party.account_receivable.id,
+                            'move': move.id,
+                            'party': sale.party.id,
+                            'journal': journal_sale,
+                            'period': Period.find(sale.company.id, date=sale.sale_date),
+                        })
+                        move_lines_new.append({
+                            'description': invoice_advanced.number,
+                            'debit': form.restante,
+                            'credit': Decimal(0.0),
+                            'account': account_return.id,
+                            'move': move.id,
+                            'journal': journal_sale,
+                            'period': Period.find(sale.company.id, date=sale.sale_date),
+                        })
+                        created_lines = MoveLine.create(move_lines_new)
+                        Move.post([move])
 
             if sale.shop.lote != None:
                 lote = sale.shop.lote
@@ -367,12 +542,41 @@ class WizardSalePayment:
                     if not move:
                         continue
                     for line in move.lines:
-                        if (not line.reconciliation and
-                                line.account.id == account.id):
+                        desc = "used"+str(sale.description)
+                        if (not line.reconciliation and line.description == desc
+                                and line.party == sale.party):
                             lines.append(line)
                             amount += line.debit - line.credit
                 if lines and amount == Decimal('0.0'):
                     Line.reconcile(lines)
+
+            if sale.total_amount < Decimal(0.0):
+                Line = pool.get('account.move.line')
+                account = sale.party.account_receivable
+                lines_dev = []
+                amount = Decimal('0.0')
+                monto_debit = Decimal('0.0')
+                monto_credit = Decimal('0.0')
+                sales_dev = Sale.search([('referencia_de_factura', '=', sale.referencia_de_factura)])
+                for sale_dev in sales_dev:
+                    for invoice in sale_dev.invoices:
+                        for line in invoice.lines_to_pay:
+                            if not line.reconciliation:
+                                lines_dev.append(line)
+                                amount += line.debit - line.credit
+                moves = Move.search([('description', '=', ('ajustes '+ str(sale.referencia_de_factura)))])
+                for move in moves:
+                    if not move:
+                        continue
+                    for line in move.lines:
+                        if (not line.reconciliation and
+                                line.account.id == account.id):
+                            lines_dev.append(line)
+                            monto_debit += line.debit
+                            monto_credit += line.credit
+                    amount = monto_debit - monto_credit
+                if lines_dev and amount == Decimal('0.0'):
+                    Line.reconcile(lines_dev)
 
             if sale.total_amount == sale.paid_amount:
                 #return 'print_'
