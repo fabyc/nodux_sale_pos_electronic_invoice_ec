@@ -159,7 +159,6 @@ class WizardSalePayment:
 
         active_id = Transaction().context.get('active_id', False)
         sale = Sale(active_id)
-        print "La descripcion cuando ingresa" , sale.reference
         if sale.self_pick_up == False:
             sale.create_shipment('out')
             sale.set_shipment_state()
@@ -305,7 +304,6 @@ class WizardSalePayment:
             modules = None
             Module = pool.get('ir.module.module')
             modules = Module.search([('name', '=', 'nodux_sale_payment_advanced_payment'), ('state', '=', 'installed')])
-            print "La descripcion aqui", sale.reference
             if modules:
                 move_invoice = None
                 for i in invoices:
