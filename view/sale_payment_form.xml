@@ -3,9 +3,7 @@
 The COPYRIGHT file at the top level of this repository contains the full
 copyright notices and license terms. -->
 <data>
-    <xpath
-        expr="/form/field[@name='tipo_p']"
-        position="after">
+    <xpath expr="/form/field[@name='tipo_p']" position="after">
         <newline/>
         <label name="tipo_pago_sri"/>
         <field name="tipo_pago_sri"/>

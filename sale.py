@@ -304,6 +304,7 @@ class WizardSalePayment:
             modules = None
             Module = pool.get('ir.module.module')
             modules = Module.search([('name', '=', 'nodux_sale_payment_advanced_payment'), ('state', '=', 'installed')])
+
             if modules:
                 move_invoice = None
                 for i in invoices:
@@ -347,8 +348,10 @@ class WizardSalePayment:
                 if form.utilizar_anticipo == True:
 
                     utiliza_anticipo_venta = True
-                    if Configuration(1).default_account_return:
+                    if Configuration(1).default_account_advanced:
                         account_advanced = Configuration(1).default_account_advanced
+                    else:
+                        self.raise_user_error('No ha configurado la cuenta de Anticipos')
 
                     pool = Pool()
                     ListAdvanced = pool.get('sale.list_advanced')
@@ -360,7 +363,7 @@ class WizardSalePayment:
                             for list_advanced in all_list_advanced:
                                 for line in list_advanced.lines:
                                     if line.amount != line.utilizado:
-                                        if pagar > line.balance and line.balance > Decimal(0.0) and pagar > Decimal(0.0):
+                                        if pagar >= line.balance and line.balance > Decimal(0.0) and pagar > Decimal(0.0):
                                             monto_balance = line.balance
                                             line.utilizado = line.utilizado + monto_balance
                                             line.balance = line.balance - monto_balance
@@ -402,8 +405,8 @@ class WizardSalePayment:
                                             created_lines = MoveLine.create(move_lines_new_advanced)
                                             Move.post([line.move])
 
-
                     if form.restante > Decimal(0.0) and form.devolver_restante == False:
+
                         pago_en_cero = True
                         restante = form.restante
                         pagar = form.anticipo - form.restante
@@ -411,7 +414,7 @@ class WizardSalePayment:
                             for list_advanced in all_list_advanced:
                                 for line in list_advanced.lines:
                                     if line.amount != line.utilizado:
-                                        if pagar > line.balance and line.balance > Decimal(0.0) and pagar > Decimal(0.0):
+                                        if pagar >= line.balance and line.balance > Decimal(0.0) and pagar > Decimal(0.0):
                                             monto_balance = line.balance
                                             line.utilizado = line.utilizado + monto_balance
                                             line.balance = line.balance - monto_balance
