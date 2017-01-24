@@ -148,6 +148,8 @@ class WizardSalePayment:
         MoveLine = pool.get('account.move.line')
         InvoiceAccountMoveLine = pool.get('account.invoice-account.move.line')
         Journal = pool.get('account.journal')
+        ModuleAdvanced = pool.get('ir.module.module')
+        modulesA = ModuleAdvanced.search([('name', '=', 'nodux_sale_payment_advanced_payment'), ('state', '=', 'installed')])
 
         form = self.start
         statements = Statement.search([
@@ -178,15 +180,16 @@ class WizardSalePayment:
                    u'Esta seguro que desea abonar $%s '
                 'del valor total $%s, de la venta al CONTADO.', (form.payment_amount, sale.total_amount))
 
-        if form.restante > Decimal(0.0) and form.devolver_restante == True:
-            self.raise_user_warning('devolucion%s' % sale.id,
-                   u'Esta seguro que desea devolver $%s '
-                'en efectivo.', (form.restante))
+        if modulesA:
+            if form.restante > Decimal(0.0) and form.devolver_restante == True:
+                self.raise_user_warning('devolucion%s' % sale.id,
+                       u'Esta seguro que desea devolver $%s '
+                    'en efectivo.', (form.restante))
 
-        if form.restante > Decimal(0.0) and form.devolver_restante == False:
-            self.raise_user_warning('anticipo%s' % sale.id,
-                   u'Esta seguro que desea dejar $%s '
-                'como anticipo del Cliente %s.', (form.restante, sale.party.name))
+            if form.restante > Decimal(0.0) and form.devolver_restante == False:
+                self.raise_user_warning('anticipo%s' % sale.id,
+                       u'Esta seguro que desea dejar $%s '
+                    'como anticipo del Cliente %s.', (form.restante, sale.party.name))
 
 
         if form.tipo_p == 'cheque':
