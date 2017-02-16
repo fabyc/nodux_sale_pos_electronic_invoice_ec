@@ -151,6 +151,9 @@ class WizardSalePayment:
         ModuleAdvanced = pool.get('ir.module.module')
         modulesA = ModuleAdvanced.search([('name', '=', 'nodux_sale_payment_advanced_payment'), ('state', '=', 'installed')])
 
+        move_lines = []
+        line_move_ids = []
+
         form = self.start
         statements = Statement.search([
                 ('journal', '=', form.journal),
@@ -194,12 +197,91 @@ class WizardSalePayment:
 
         if form.tipo_p == 'cheque':
             sale.tipo_p = form.tipo_p
-            sale.banco = form.banco
+            sale.bancos = form.bancos
             sale.numero_cuenta = form.numero_cuenta
             sale.fecha_deposito= form.fecha_deposito
             sale.titular = form.titular
             sale.numero_cheque = form.numero_cheque
-            sale.sale_date = date
+            #se cambia para Pruebas de TONERS, para que acepte fecha anterior
+            #sale.sale_date = date
+            move, = Move.create([{
+                'period': Period.find(sale.company.id, date=sale.sale_date),
+                'journal': 1,
+                'date': sale.sale_date,
+                'origin': str(sale),
+                'description': str(sale.id),
+            }])
+
+            postdated_lines = None
+            Configuration = pool.get('account.configuration')
+            if Configuration(1).default_account_check:
+                account_check = Configuration(1).default_account_check
+            else:
+                self.raise_user_error('No ha configurado la cuenta por defecto para Cheques. \nDirijase a Financiero-Configuracion-Configuracion Contable')
+
+            move_lines.append({
+                'description' : str(sale.id),
+                'debit': form.payment_amount,
+                'credit': Decimal(0.0),
+                'account': account_check,
+                'move': move.id,
+                'journal': 1,
+                'period': Period.find(sale.company.id, date=sale.sale_date),
+            })
+            move_lines.append({
+                'description': str(sale.id),
+                'debit': Decimal(0.0),
+                'credit': form.payment_amount,
+                'account': sale.party.account_receivable.id,
+                'move': move.id,
+                'journal': 1,
+                'period': Period.find(sale.company.id, date=sale.sale_date),
+                'date': sale.sale_date,
+                'party': sale.party.id,
+            })
+            self.create_move(move_lines, move)
+            postdated_lines = []
+            if form.bancos:
+                pass
+            else:
+                self.raise_user_error('Ingrese el banco')
+
+            if form.numero_cheque:
+                pass
+            else:
+                self.raise_user_error('Ingrese el numero de cheque')
+
+            if form.numero_cuenta:
+                pass
+            else:
+                self.raise_user_error('Ingrese el numero de cuenta')
+
+            postdated_lines.append({
+                'reference': str(sale.id),
+                'name': str(sale.id),
+                'amount': Decimal(form.payment_amount),
+                'account': account_check,
+                'date_expire': sale.sale_date,
+                'date': sale.sale_date,
+                'num_check' : form.numero_cheque,
+                'num_account' : form.numero_cuenta,
+            })
+
+            if postdated_lines != None:
+                Postdated = pool.get('account.postdated')
+                postdated = Postdated()
+                for line in postdated_lines:
+                    date = line['date']
+                    postdated.postdated_type = 'check'
+                    postdated.reference = str(sale.id)
+                    postdated.party = sale.party
+                    postdated.post_check_type = 'receipt'
+                    postdated.journal = 1
+                    postdated.lines = postdated_lines
+                    postdated.state = 'draft'
+                    postdated.date = sale.sale_date
+                    postdated.save()
+            #sale.sale_date = date
             sale.save()
 
         if form.tipo_p == 'deposito':
@@ -208,7 +290,7 @@ class WizardSalePayment:
             sale.numero_cuenta_deposito = form.numero_cuenta_deposito
             sale.fecha_deposito = form.fecha_deposito
             sale.numero_deposito= form.numero_deposito
-            sale.sale_date = date
+            #sale.sale_date = date
             sale.save()
 
         if form.tipo_p == 'tarjeta':
@@ -216,14 +298,89 @@ class WizardSalePayment:
             sale.numero_tarjeta = form.numero_tarjeta
             sale.lote = form.lote
             sale.tarjeta = form.tarjeta
-            sale.sale_date = date
+            #sale.sale_date = date
+            move, = Move.create([{
+                'period': Period.find(sale.company.id, date=sale.sale_date),
+                'journal': 1,
+                'date': sale.sale_date,
+                'origin': str(sale),
+                'description': str(sale.id),
+            }])
+            Configuration = pool.get('account.configuration')
+            if Configuration(1).default_account_card:
+                account_card = Configuration(1).default_account_card
+            else:
+                self.raise_user_error('No ha configurado la cuenta por defecto para Tarjetas. \nDirijase a Financiero-Configuracion-Configuracion Contable')
+
+            move_lines.append({
+                'description' : str(sale.id),
+                'debit': form.payment_amount,
+                'credit': Decimal(0.0),
+                'account': account_card,
+                'move': move.id,
+                'journal': 1,
+                'period': Period.find(sale.company.id, date=sale.sale_date),
+            })
+            move_lines.append({
+                'description': str(sale.id),
+                'debit': Decimal(0.0),
+                'credit': form.payment_amount,
+                'account': sale.party.account_receivable.id,
+                'move': move.id,
+                'journal': 1,
+                'period': Period.find(sale.company.id, date=sale.sale_date),
+                'date': sale.sale_date,
+                'party': sale.party.id,
+            })
+            self.create_move(move_lines, move)
+            postdated_lines = []
+            if form.numero_tarjeta:
+                pass
+            else:
+                self.raise_user_error('Ingrese el numero de Tarjeta')
+
+            if form.tarjeta:
+                pass
+            else:
+                self.raise_user_error('Ingrese la Tarjeta')
+
+            if form.lote:
+                pass
+            else:
+                self.raise_user_error('Ingrese el no. de lote de la tarjeta')
+
+            postdated_lines.append({
+                'reference': str(sale.id),
+                'name': str(sale.id),
+                'amount': Decimal(form.payment_amount),
+                'account': account_card,
+                'date_expire': sale.sale_date,
+                'date': sale.sale_date,
+                'num_check' : form.numero_tarjeta,
+                'num_account' : form.lote,
+            })
+
+            if postdated_lines != None:
+                Postdated = pool.get('account.postdated')
+                postdated = Postdated()
+                for line in postdated_lines:
+                    date = line['date']
+                    postdated.postdated_type = 'card'
+                    postdated.reference = str(sale.id)
+                    postdated.party = sale.party
+                    postdated.post_check_type = 'receipt'
+                    postdated.journal = 1
+                    postdated.lines = postdated_lines
+                    postdated.state = 'draft'
+                    postdated.date = sale.sale_date
+                    postdated.save()
             sale.save()
 
         if form.tipo_p == 'efectivo':
             sale.tipo_p = form.tipo_p
             sale.recibido = form.recibido
             sale.cambio = form.cambio_cliente
-            sale.sale_date = date
+            #sale.sale_date = date
             sale.save()
 
         if not sale.reference:
@@ -237,7 +394,9 @@ class WizardSalePayment:
         if form.payment_amount:
             payment = StatementLine(
                 statement=statements[0].id,
-                date=Date.today(),
+                #se cambia para Pruebas de TONERS, para que acepte fecha anterior
+                #date=Date.today(),
+                date=sale.sale_date,
                 amount=form.payment_amount,
                 party=sale.party.id,
                 account=account,
@@ -612,6 +771,16 @@ class WizardSalePayment:
                 return 'end'
 
         return 'end'
+
+    def create_move(self, move_lines, move):
+        pool = Pool()
+        Move = pool.get('account.move')
+        MoveLine = pool.get('account.move.line')
+        Invoice = pool.get('account.invoice')
+        created_lines = MoveLine.create(move_lines)
+        Move.post([move])
+
+        return True
 
 class InvoiceReportPosE(Report):
     __name__ = 'nodux_sale_pos_electronic_invoice_ec.invoice_pos_e'
