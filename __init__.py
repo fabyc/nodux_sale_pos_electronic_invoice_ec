@@ -4,12 +4,14 @@
 from trytond.pool import Pool
 from .sale import *
 from .shop import *
+from .move import *
 
 def register():
     Pool.register(
         Sale,
         SaleShop,
         SalePaymentForm,
+        Move,
         module='nodux_sale_pos_electronic_invoice_ec', type_='model')
     Pool.register(
         WizardSalePayment,
