@@ -137,7 +137,6 @@ class WizardSalePayment:
         super(WizardSalePayment, cls).__setup__()
 
     def transition_pay_(self):
-        print "Ingresa aqui"
         pool = Pool()
         Date = pool.get('ir.date')
         Sale = pool.get('sale.sale')
