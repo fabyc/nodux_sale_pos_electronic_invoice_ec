@@ -408,7 +408,12 @@ class WizardSalePayment:
         if sale.acumulativo != True:
             if sale.total_amount < Decimal(0.0):
                 if (sale.total_amount) == form.payment_amount:
-                    pass
+                    sale.devolucion = True
+                    sales_d = Sale.search([('description', '=', sale.description)])
+                    for sale_d in sales_d:
+                        sale_d.devolucion = True
+                        sale_d.referencia_de_factura = sale.description
+                        sale_d.save()
                 else:
                     move_lines_dev= []
                     line_move__dev_ids = []
