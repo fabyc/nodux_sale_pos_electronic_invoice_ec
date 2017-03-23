@@ -407,53 +407,56 @@ class WizardSalePayment:
 
         if sale.acumulativo != True:
             if sale.total_amount < Decimal(0.0):
-                move_lines_dev= []
-                line_move__dev_ids = []
-                reconcile_lines_dev_advanced = []
+                if (sale.total_amount) == form.payment_amount:
+                    pass
+                else:
+                    move_lines_dev= []
+                    line_move__dev_ids = []
+                    reconcile_lines_dev_advanced = []
 
-                journal_r = Journal.search([('type', '=', 'revenue')])
-                for j in journal_r:
-                    journal_sale = j.id
+                    journal_r = Journal.search([('type', '=', 'revenue')])
+                    for j in journal_r:
+                        journal_sale = j.id
 
-                move_dev, = Move.create([{
-                    'period': Period.find(sale.company.id, date=sale.sale_date),
-                    'journal': journal_sale,
-                    'date': sale.sale_date,
-                    'origin': str(sale),
-                    'description': 'ajustes '+ str(sale.description),
-                }])
+                    move_dev, = Move.create([{
+                        'period': Period.find(sale.company.id, date=sale.sale_date),
+                        'journal': journal_sale,
+                        'date': sale.sale_date,
+                        'origin': str(sale),
+                        'description': 'ajustes '+ str(sale.description),
+                    }])
 
-                move_lines_dev.append({
-                    'description': 'ajustes '+ str(sale.description),
-                    'debit': Decimal(0.0),
-                    'credit': sale.total_amount * (-1),
-                    'account': sale.party.account_receivable.id,
-                    'move': move_dev.id,
-                    'party': sale.party.id,
-                    'journal': journal_sale,
-                    'period': Period.find(sale.company.id, date=sale.sale_date),
-                })
+                    move_lines_dev.append({
+                        'description': 'ajustes '+ str(sale.description),
+                        'debit': Decimal(0.0),
+                        'credit': sale.total_amount * (-1),
+                        'account': sale.party.account_receivable.id,
+                        'move': move_dev.id,
+                        'party': sale.party.id,
+                        'journal': journal_sale,
+                        'period': Period.find(sale.company.id, date=sale.sale_date),
+                    })
 
-                move_lines_dev.append({
-                    'description':  'ajustes '+ str(sale.description),
-                    'debit': sale.total_amount * (-1),
-                    'credit': Decimal(0.0),
-                    'account': sale.party.account_receivable.id,
-                    'move': move_dev.id,
-                    'party': sale.party.id,
-                    'journal': journal_sale,
-                    'period': Period.find(sale.company.id, date=sale.sale_date),
-                })
+                    move_lines_dev.append({
+                        'description':  'ajustes '+ str(sale.description),
+                        'debit': sale.total_amount * (-1),
+                        'credit': Decimal(0.0),
+                        'account': sale.party.account_receivable.id,
+                        'move': move_dev.id,
+                        'party': sale.party.id,
+                        'journal': journal_sale,
+                        'period': Period.find(sale.company.id, date=sale.sale_date),
+                    })
 
-                created_lines_dev = MoveLine.create(move_lines_dev)
-                Move.post([move_dev])
+                    created_lines_dev = MoveLine.create(move_lines_dev)
+                    Move.post([move_dev])
 
-                sale.devolucion = True
-                sales_d = Sale.search([('description', '=', sale.description)])
-                for sale_d in sales_d:
-                    sale_d.devolucion = True
-                    sale_d.referencia_de_factura = sale.description
-                    sale_d.save()
+                    sale.devolucion = True
+                    sales_d = Sale.search([('description', '=', sale.description)])
+                    for sale_d in sales_d:
+                        sale_d.devolucion = True
+                        sale_d.referencia_de_factura = sale.description
+                        sale_d.save()
 
             pago_en_cero = False
             utiliza_anticipo_venta = False
@@ -769,7 +772,6 @@ class WizardSalePayment:
                 sale.description = sale.reference
                 sale.save()
                 return 'end'
-
         return 'end'
 
     def create_move(self, move_lines, move):
